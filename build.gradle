@@ -1,0 +1,34 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+jar {
+	baseName = project.name
+	version = "$jarVersion"
+}
+
+sourceCompatibility = "$javaVersion"
+targetCompatibility = "$javaVersion"
+
+repositories {
+	mavenCentral()
+}
+
+idea.project {
+	jdkName = "$javaVersion"
+	languageLevel = "$javaVersion"
+	vcs = "Git"
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-amqp')
+}
