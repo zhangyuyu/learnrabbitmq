@@ -10,6 +10,7 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
+apply plugin: 'application'
 
 jar {
 	baseName = project.name
@@ -31,4 +32,10 @@ idea.project {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-amqp')
+	compile('org.springframework.boot:spring-boot-starter-web')
 }
+
+
+applicationDefaultJvmArgs = [
+		"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5505"
+]
