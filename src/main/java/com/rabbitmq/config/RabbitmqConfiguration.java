@@ -1,22 +1,31 @@
 package com.rabbitmq.config;
 
-import com.rabbitmq.helloworld.MessageReceiver;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.AbstractConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@EnableRabbit
 public class RabbitmqConfiguration {
 
-    @Value("${hello.world.queue.name}")
-    public String queueName;
+    @Value("${fanout.first.queue.name}")
+    public String fanoutFirstQueue;
+
+    @Value("${fanout.second.queue.name}")
+    public String fanoutSecondQueue;
+
+    @Value("${fanout.exchange.name}")
+    public String exchangeName;
 
     @Value("${rabbitmq.host}")
     public String host;
@@ -28,8 +37,29 @@ public class RabbitmqConfiguration {
     public String password;
 
     @Bean
-    public Queue queue() {
-        return new Queue(queueName);
+    public Queue fanoutFirstQueue() {
+        return new Queue(fanoutFirstQueue);
+    }
+
+    @Bean
+    public Queue fanoutSecondQueue() {
+        return new Queue(fanoutSecondQueue);
+    }
+
+    @Bean
+    public FanoutExchange exchange() {
+        return new FanoutExchange(exchangeName);
+    }
+
+    @Bean
+    Binding bindingFirstQueue(@Qualifier("fanoutFirstQueue") Queue queue, FanoutExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange);
+    }
+
+
+    @Bean
+    Binding bindingSecondQueue(@Qualifier("fanoutSecondQueue") Queue queue, FanoutExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange);
     }
 
     @Bean
@@ -44,24 +74,15 @@ public class RabbitmqConfiguration {
     @Bean
     public RabbitTemplate rabbitTemplate() {
         RabbitTemplate template = new RabbitTemplate(connectionFactory());
-        template.setQueue(queueName);
-        template.setRoutingKey(queueName);
+        template.setExchange(exchangeName);
         return template;
     }
 
     @Bean
-    SimpleMessageListenerContainer listenerContainer(ConnectionFactory connectionFactory,
-                                                     MessageListenerAdapter listenerAdapter) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(queueName);
-        container.setMessageListener(listenerAdapter);
-        return container;
-    }
-
-    @Bean
-    MessageListenerAdapter listenerAdapter(MessageReceiver receiver) {
-        return new MessageListenerAdapter(receiver);
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory() {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory());
+        return factory;
     }
 
 }

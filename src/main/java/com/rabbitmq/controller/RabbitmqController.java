@@ -1,6 +1,6 @@
 package com.rabbitmq.controller;
 
-import com.rabbitmq.helloworld.MessageSender;
+import com.rabbitmq.message.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

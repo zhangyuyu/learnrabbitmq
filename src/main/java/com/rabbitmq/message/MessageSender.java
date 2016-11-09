@@ -1,4 +1,4 @@
-package com.rabbitmq.helloworld;
+package com.rabbitmq.message;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,5 @@ public class MessageSender {
     public void send(String message) {
         template.convertAndSend(message);
         System.out.println("Sent: " + message);
-
     }
 }
