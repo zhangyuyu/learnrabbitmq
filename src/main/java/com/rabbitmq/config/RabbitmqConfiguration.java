@@ -1,30 +1,32 @@
 package com.rabbitmq.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.AbstractConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Configuration
 @EnableRabbit
 public class RabbitmqConfiguration {
 
-    @Value("${topic.first.queue.name}")
-    public String topicFirstQueue;
+    @Value("${headers.first.queue.name}")
+    public String headersFirstQueue;
 
-    @Value("${topic.second.queue.name}")
-    public String topicSecondQueue;
+    @Value("${headers.second.queue.name}")
+    public String headersSecondQueue;
 
-    @Value("${topic.exchange.name}")
+    @Value("${headers.exchange.name}")
     public String exchangeName;
 
     @Value("${rabbitmq.host}")
@@ -37,28 +39,34 @@ public class RabbitmqConfiguration {
     public String password;
 
     @Bean
-    public Queue topicFirstQueue() {
-        return new Queue(topicFirstQueue);
+    public Queue headersFirstQueue() {
+        return new Queue(headersFirstQueue);
     }
 
     @Bean
-    public Queue topicSecondQueue() {
-        return new Queue(topicSecondQueue);
+    public Queue headersSecondQueue() {
+        return new Queue(headersSecondQueue);
     }
 
     @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange(exchangeName);
+    public HeadersExchange exchange() {
+        return new HeadersExchange(exchangeName);
     }
 
     @Bean
-    Binding bindingFirstQueue(@Qualifier("topicFirstQueue") Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("routing.key.for.*.queue");
+    Binding bindingFirstQueue(@Qualifier("headersFirstQueue") Queue queue, HeadersExchange exchange) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "headers");
+        map.put("number", "first");
+        return BindingBuilder.bind(queue).to(exchange).whereAny(map).match();
     }
 
     @Bean
-    Binding bindingSecondQueue(@Qualifier("topicSecondQueue") Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with("routing.key.for.second.queue");
+    Binding bindingSecondQueue(@Qualifier("headersSecondQueue") Queue queue, HeadersExchange exchange) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "headers");
+        map.put("number", "second");
+        return BindingBuilder.bind(queue).to(exchange).whereAll(map).match();
     }
 
     @Bean

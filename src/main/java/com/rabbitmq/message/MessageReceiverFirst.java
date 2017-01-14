@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageReceiverFirst {
 
-    @RabbitListener(queues = "TOPIC.FIRST.QUEUE")
+    @RabbitListener(queues = "HEADERS.FIRST.QUEUE")
     public void handleMessage(String message) {
-        System.out.println("TOPIC.FIRST.QUEUE Received: " + message);
+        System.out.println("HEADERS.FIRST.QUEUE Received: " + message);
     }
 }

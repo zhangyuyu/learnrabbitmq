@@ -16,8 +16,8 @@ public class RabbitmqController {
     MessageSender sender;
 
     @RequestMapping(method = POST)
-    public void sendByQueue(@RequestParam String routingKey, @RequestParam String message) {
-        sender.send(routingKey, message);
+    public void sendByQueue(@RequestParam String message) {
+        sender.send(message);
     }
 
 }
