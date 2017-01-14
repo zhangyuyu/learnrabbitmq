@@ -26,3 +26,7 @@ sudo ./rabbitmq-server start
 `http://localhost:8080/rabbitmq?message=hello&routingKey=routing-key-for-first-queue`
 与direct exchange相连接的，并且routingKey匹配的queue才会收到该消息。
 
+** topic exchange
+`http://localhost:8080/rabbitmq?message=hello&routingKey=routing-key-for-anystring-queue`
+与topic exchange相连接的，并且routingKey*模糊*匹配的queue才会收到该消息。
+
