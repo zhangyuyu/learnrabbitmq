@@ -2,7 +2,7 @@ package com.rabbitmq.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -18,13 +18,13 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 public class RabbitmqConfiguration {
 
-    @Value("${fanout.first.queue.name}")
-    public String fanoutFirstQueue;
+    @Value("${direct.first.queue.name}")
+    public String directFirstQueue;
 
-    @Value("${fanout.second.queue.name}")
-    public String fanoutSecondQueue;
+    @Value("${direct.second.queue.name}")
+    public String directSecondQueue;
 
-    @Value("${fanout.exchange.name}")
+    @Value("${direct.exchange.name}")
     public String exchangeName;
 
     @Value("${rabbitmq.host}")
@@ -37,29 +37,28 @@ public class RabbitmqConfiguration {
     public String password;
 
     @Bean
-    public Queue fanoutFirstQueue() {
-        return new Queue(fanoutFirstQueue);
+    public Queue directFirstQueue() {
+        return new Queue(directFirstQueue);
     }
 
     @Bean
-    public Queue fanoutSecondQueue() {
-        return new Queue(fanoutSecondQueue);
+    public Queue directSecondQueue() {
+        return new Queue(directSecondQueue);
     }
 
     @Bean
-    public FanoutExchange exchange() {
-        return new FanoutExchange(exchangeName);
+    public DirectExchange exchange() {
+        return new DirectExchange(exchangeName);
     }
 
     @Bean
-    Binding bindingFirstQueue(@Qualifier("fanoutFirstQueue") Queue queue, FanoutExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange);
+    Binding bindingFirstQueue(@Qualifier("directFirstQueue") Queue queue, DirectExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("routing.key.for.first.queue");
     }
 
-
     @Bean
-    Binding bindingSecondQueue(@Qualifier("fanoutSecondQueue") Queue queue, FanoutExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange);
+    Binding bindingSecondQueue(@Qualifier("directSecondQueue") Queue queue, DirectExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("routing.key.for.second.queue");
     }
 
     @Bean

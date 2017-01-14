@@ -22,3 +22,7 @@ sudo ./rabbitmq-server start
 `http://localhost:8080/rabbitmq/message/hello`
 与fanout exchange相连接的queue都会收到该消息。
 
+** direct exchange
+`http://localhost:8080/rabbitmq?message=hello&routingKey=routing-key-for-first-queue`
+与direct exchange相连接的，并且routingKey匹配的queue才会收到该消息。
+

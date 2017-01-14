@@ -10,8 +10,8 @@ public class MessageSender {
     @Autowired
     private RabbitTemplate template;
 
-    public void send(String message) {
-        template.convertAndSend(message);
+    public void send(String routingKey, String message) {
+        template.convertAndSend(routingKey, message);
         System.out.println("Sent: " + message);
     }
 }
